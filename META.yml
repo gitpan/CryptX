@@ -1,0 +1,167 @@
+---
+abstract: 'Crypto toolkit'
+author:
+  - 'Karel Miko'
+build_requires:
+  Carp: 0
+  ExtUtils::CBuilder: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CryptX
+provides:
+  Crypt::Cipher:
+    file: lib/Crypt/Cipher.pm
+    version: 0
+  Crypt::Cipher::AES:
+    file: lib/Crypt/Cipher/AES.pm
+    version: 0
+  Crypt::Cipher::Anubis:
+    file: lib/Crypt/Cipher/Anubis.pm
+    version: 0
+  Crypt::Cipher::Blowfish:
+    file: lib/Crypt/Cipher/Blowfish.pm
+    version: 0
+  Crypt::Cipher::CAST5:
+    file: lib/Crypt/Cipher/CAST5.pm
+    version: 0
+  Crypt::Cipher::Camellia:
+    file: lib/Crypt/Cipher/Camellia.pm
+    version: 0
+  Crypt::Cipher::DES:
+    file: lib/Crypt/Cipher/DES.pm
+    version: 0
+  Crypt::Cipher::DES_EDE:
+    file: lib/Crypt/Cipher/DES_EDE.pm
+    version: 0
+  Crypt::Cipher::KASUMI:
+    file: lib/Crypt/Cipher/KASUMI.pm
+    version: 0
+  Crypt::Cipher::Khazad:
+    file: lib/Crypt/Cipher/Khazad.pm
+    version: 0
+  Crypt::Cipher::MULTI2:
+    file: lib/Crypt/Cipher/MULTI2.pm
+    version: 0
+  Crypt::Cipher::Noekeon:
+    file: lib/Crypt/Cipher/Noekeon.pm
+    version: 0
+  Crypt::Cipher::RC2:
+    file: lib/Crypt/Cipher/RC2.pm
+    version: 0
+  Crypt::Cipher::RC5:
+    file: lib/Crypt/Cipher/RC5.pm
+    version: 0
+  Crypt::Cipher::RC6:
+    file: lib/Crypt/Cipher/RC6.pm
+    version: 0
+  Crypt::Cipher::SAFERP:
+    file: lib/Crypt/Cipher/SAFERP.pm
+    version: 0
+  Crypt::Cipher::SAFER_K128:
+    file: lib/Crypt/Cipher/SAFER_K128.pm
+    version: 0
+  Crypt::Cipher::SAFER_K64:
+    file: lib/Crypt/Cipher/SAFER_K64.pm
+    version: 0
+  Crypt::Cipher::SAFER_SK128:
+    file: lib/Crypt/Cipher/SAFER_SK128.pm
+    version: 0
+  Crypt::Cipher::SAFER_SK64:
+    file: lib/Crypt/Cipher/SAFER_SK64.pm
+    version: 0
+  Crypt::Cipher::SEED:
+    file: lib/Crypt/Cipher/SEED.pm
+    version: 0
+  Crypt::Cipher::Skipjack:
+    file: lib/Crypt/Cipher/Skipjack.pm
+    version: 0
+  Crypt::Cipher::Twofish:
+    file: lib/Crypt/Cipher/Twofish.pm
+    version: 0
+  Crypt::Cipher::XTEA:
+    file: lib/Crypt/Cipher/XTEA.pm
+    version: 0
+  Crypt::Digest:
+    file: lib/Crypt/Digest.pm
+    version: 0
+  Crypt::Digest::CHAES:
+    file: lib/Crypt/Digest/CHAES.pm
+    version: 0
+  Crypt::Digest::MD2:
+    file: lib/Crypt/Digest/MD2.pm
+    version: 0
+  Crypt::Digest::MD4:
+    file: lib/Crypt/Digest/MD4.pm
+    version: 0
+  Crypt::Digest::MD5:
+    file: lib/Crypt/Digest/MD5.pm
+    version: 0
+  Crypt::Digest::RIPEMD128:
+    file: lib/Crypt/Digest/RIPEMD128.pm
+    version: 0
+  Crypt::Digest::RIPEMD160:
+    file: lib/Crypt/Digest/RIPEMD160.pm
+    version: 0
+  Crypt::Digest::RIPEMD256:
+    file: lib/Crypt/Digest/RIPEMD256.pm
+    version: 0
+  Crypt::Digest::RIPEMD320:
+    file: lib/Crypt/Digest/RIPEMD320.pm
+    version: 0
+  Crypt::Digest::SHA1:
+    file: lib/Crypt/Digest/SHA1.pm
+    version: 0
+  Crypt::Digest::SHA224:
+    file: lib/Crypt/Digest/SHA224.pm
+    version: 0
+  Crypt::Digest::SHA256:
+    file: lib/Crypt/Digest/SHA256.pm
+    version: 0
+  Crypt::Digest::SHA384:
+    file: lib/Crypt/Digest/SHA384.pm
+    version: 0
+  Crypt::Digest::SHA512:
+    file: lib/Crypt/Digest/SHA512.pm
+    version: 0
+  Crypt::Digest::Tiger192:
+    file: lib/Crypt/Digest/Tiger192.pm
+    version: 0
+  Crypt::Digest::Whirlpool:
+    file: lib/Crypt/Digest/Whirlpool.pm
+    version: 0
+  Crypt::Mac:
+    file: lib/Crypt/Mac.pm
+    version: 0
+  Crypt::Mac::F9:
+    file: lib/Crypt/Mac/F9.pm
+    version: 0
+  Crypt::Mac::HMAC:
+    file: lib/Crypt/Mac/HMAC.pm
+    version: 0
+  Crypt::Mac::OMAC:
+    file: lib/Crypt/Mac/OMAC.pm
+    version: 0
+  Crypt::Mac::PMAC:
+    file: lib/Crypt/Mac/PMAC.pm
+    version: 0
+  Crypt::Mac::Pelican:
+    file: lib/Crypt/Mac/Pelican.pm
+    version: 0
+  Crypt::Mac::XCBC:
+    file: lib/Crypt/Mac/XCBC.pm
+    version: 0
+  CryptX:
+    file: lib/CryptX.pm
+    version: 0.002
+requires:
+  Carp: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002
