@@ -257,13 +257,13 @@
          "file" : "lib/Crypt/Mode/OFB.pm",
          "version" : 0
       },
-      "Crypt::Random" : {
-         "file" : "lib/Crypt/Random.pm",
+      "Crypt::PRNG" : {
+         "file" : "lib/Crypt/PRNG.pm",
          "version" : 0
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -272,5 +272,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.003"
+   "version" : "0.004"
 }

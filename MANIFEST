@@ -57,7 +57,7 @@ lib/Crypt/Mode/CFB.pm
 lib/Crypt/Mode/CTR.pm
 lib/Crypt/Mode/ECB.pm
 lib/Crypt/Mode/OFB.pm
-lib/Crypt/Random.pm
+lib/Crypt/PRNG.pm
 lib/CryptX.pm
 lib/CryptX.xs
 lib/CryptX_AuthEnc_CCM.xs.inc
