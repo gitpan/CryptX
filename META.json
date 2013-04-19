@@ -211,6 +211,10 @@
          "file" : "lib/Crypt/Digest/Whirlpool.pm",
          "version" : 0
       },
+      "Crypt::KeyDerivation" : {
+         "file" : "lib/Crypt/KeyDerivation.pm",
+         "version" : 0
+      },
       "Crypt::Mac" : {
          "file" : "lib/Crypt/Mac.pm",
          "version" : 0
@@ -301,7 +305,7 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -310,5 +314,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.005"
+   "version" : "0.006"
 }

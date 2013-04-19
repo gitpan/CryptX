@@ -44,6 +44,7 @@ lib/Crypt/Digest/SHA384.pm
 lib/Crypt/Digest/SHA512.pm
 lib/Crypt/Digest/Tiger192.pm
 lib/Crypt/Digest/Whirlpool.pm
+lib/Crypt/KeyDerivation.pm
 lib/Crypt/Mac.pm
 lib/Crypt/Mac/F9.pm
 lib/Crypt/Mac/HMAC.pm
@@ -74,6 +75,7 @@ lib/CryptX_AuthEnc_GCM.xs.inc
 lib/CryptX_AuthEnc_OCB.xs.inc
 lib/CryptX_Cipher.xs.inc
 lib/CryptX_Digest.xs.inc
+lib/CryptX_KeyDerivation.xs.inc
 lib/CryptX_Mac_F9.xs.inc
 lib/CryptX_Mac_HMAC.xs.inc
 lib/CryptX_Mac_OMAC.xs.inc
@@ -634,6 +636,7 @@ t/digest_sha512.t
 t/digest_test_vectors_ltc.t
 t/digest_tiger192.t
 t/digest_whirlpool.t
+t/key_derivation.t
 t/mac_f9.t
 t/mac_hmac.t
 t/mac_hmac_test_vectors_ltc.t

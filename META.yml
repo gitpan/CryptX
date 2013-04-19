@@ -150,6 +150,9 @@ provides:
   Crypt::Digest::Whirlpool:
     file: lib/Crypt/Digest/Whirlpool.pm
     version: 0
+  Crypt::KeyDerivation:
+    file: lib/Crypt/KeyDerivation.pm
+    version: 0
   Crypt::Mac:
     file: lib/Crypt/Mac.pm
     version: 0
@@ -218,9 +221,9 @@ provides:
     version: 0
   CryptX:
     file: lib/CryptX.pm
-    version: 0.005
+    version: 0.006
 requires:
   MIME::Base64: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.005
+version: 0.006
