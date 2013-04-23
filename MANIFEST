@@ -1,5 +1,6 @@
 Build.PL
 Changes
+lib/Crypt/AuthEnc.pm
 lib/Crypt/AuthEnc/CCM.pm
 lib/Crypt/AuthEnc/EAX.pm
 lib/Crypt/AuthEnc/GCM.pm

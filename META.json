@@ -35,6 +35,10 @@
       }
    },
    "provides" : {
+      "Crypt::AuthEnc" : {
+         "file" : "lib/Crypt/AuthEnc.pm",
+         "version" : 0
+      },
       "Crypt::AuthEnc::CCM" : {
          "file" : "lib/Crypt/AuthEnc/CCM.pm",
          "version" : 0
@@ -305,7 +309,7 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -314,5 +318,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.006"
+   "version" : "0.007"
 }
