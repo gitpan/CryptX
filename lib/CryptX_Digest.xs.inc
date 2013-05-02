@@ -48,18 +48,21 @@ clone(self)
         RETVAL
 
 void
-_add_single(self, data)
-        Crypt::Digest self
-        SV * data
-    CODE:
+add(Crypt::Digest self, ...)
+    PPCODE:
     {
         STRLEN inlen;
-        int rv;
+        int rv, i;
         unsigned char *in;
         
-        in = (unsigned char *)SvPVbyte(data, inlen);
-        rv = self->desc->process(&self->state, in, inlen);
-        if (rv != CRYPT_OK) croak("FATAL: digest process failed: %s", error_to_string(rv));
+        for(i=1; i<items; i++) {
+          in = (unsigned char *)SvPVbyte(ST(i), inlen);
+          if (inlen>0) {
+            rv = self->desc->process(&self->state, in, inlen);
+            if (rv != CRYPT_OK) croak("FATAL: digest process failed: %s", error_to_string(rv));
+          }
+        }
+        XPUSHs(sv_2mortal(newSVsv(ST(0)))); /* XXX-HACK returning 'self' */
     }
 
 SV *

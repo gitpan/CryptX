@@ -309,7 +309,7 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -318,5 +318,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.007"
+   "version" : "0.008"
 }
