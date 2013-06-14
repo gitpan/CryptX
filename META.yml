@@ -224,10 +224,10 @@ provides:
     version: 0
   CryptX:
     file: lib/CryptX.pm
-    version: 0.009
+    version: 0.011
 requires:
   MIME::Base64: 0
   perl: 5.008008
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.009
+version: 0.011
