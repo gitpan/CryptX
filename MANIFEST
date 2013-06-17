@@ -509,9 +509,11 @@ libtom-src/prngs/yarrow.c
 libtom-src/tommath.h
 libtom-src/tommath_class.h
 libtom-src/tommath_superclass.h
+LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+README
 t/001_compile.t
 t/002_all_pm.t
 t/003_all_pm_pod.t

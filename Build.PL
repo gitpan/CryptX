@@ -1,5 +1,4 @@
-use 5.008008;
-
+use 5.006;
 use strict;
 use warnings;
 use Module::Build;
@@ -60,16 +59,18 @@ my $builder = $class->new(
   dist_author          => 'Karel Miko',
   dist_version_from    => 'lib/CryptX.pm',
   license              => 'perl',
+  create_readme        => 1,
   extra_compiler_flags => $flags,
   c_source             => $src,
   requires             => {
-    'perl'          => '5.008008',
+    'perl'          => '5.006',
     'MIME::Base64'  => 0,
+    'Exporter'      => '5.59',  # we need: use Exporter 'import';
   },
   build_requires       => {
     'MIME::Base64'  => 0,
     'Module::Build' => 0,
-    'Test::More'    => '0.88', # done_testing available since 0.88
+    'Test::More'    => '0.88',  # we need: done_testing
     'File::Find'    => 0,
   },
   configure_requires   => {
