@@ -89,16 +89,16 @@ sub sign_message {
   return $self->_sign($self->_truncate($data_hash));
 }
 
-sub sign_hash {
-  my ($self, $data_hash) = @_;
-  return $self->_sign($self->_truncate($data_hash));
-}
-
 sub verify_message {
   my ($self, $sig, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
   my $data_hash = digest_data($hash_name, $data);
   return $self->_verify($sig, $self->_truncate($data_hash));
+}
+
+sub sign_hash {
+  my ($self, $data_hash) = @_;
+  return $self->_sign($self->_truncate($data_hash));
 }
 
 sub verify_hash {
@@ -371,14 +371,14 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  my $hash = $pk->key2hash;
  
- returns hash like this (or undef if no key loaded):
+ # returns hash like this (or undef if no key loaded):
  {
-   type => 1,  # integer: 1 .. private, 0 .. public
-   qord => 30, # integer: order of the sub-group
+   type => 1,   # integer: 1 .. private, 0 .. public
+   size => 256, # integer: key size in bytes
    # all the rest are hex strings  
-   g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator
-   p => "AAF839A764E04D80824B79FA1F0496C093...", #prime used to generate the sub-group
-   q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #large prime that generats the field the contains the sub-group
-   x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key
-   y => "8F7604D77FA62C7539562458A63C7611B7...", #public key
+   p => "AAF839A764E04D80824B79FA1F0496C093...", #prime modulus
+   q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #prime divisor
+   g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator of a subgroup of order q in GF(p)
+   x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
+   y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
  }

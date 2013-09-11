@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_secret )] );
+our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Digest;
+use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
@@ -59,14 +59,28 @@ sub decrypt {
   return $self->_decrypt($data);
 }
 
-sub sign {
-  my ($self, $data) = @_;  
-  return $self->_sign($data);
+sub sign_message {
+  my ($self, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_sign($data_hash);
 }
 
-sub verify {
-  my ($self, $sig, $data) = @_;  
-  return $self->_verify($sig, $data);
+sub verify_message {
+  my ($self, $sig, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_verify($sig, $data_hash);
+}
+
+sub sign_hash {
+  my ($self, $data_hash) = @_;
+  return $self->_sign($data_hash);
+}
+
+sub verify_hash {
+  my ($self, $sig, $data_hash) = @_;  
+  return $self->_verify($sig, $data_hash);
 }
 
 ### FUNCTIONS
@@ -85,18 +99,32 @@ sub ecc_decrypt {
   return $key->decrypt(@_);
 }
 
-sub ecc_sign {
+sub ecc_sign_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
-  return $key->sign(@_);
+  return $key->sign_message(@_);
 }
 
-sub ecc_verify {
+sub ecc_verify_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
-  return $key->verify(@_);
+  return $key->verify_message(@_);
+}
+
+sub ecc_sign_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  return $key->sign_hash(@_);
+}
+
+sub ecc_verify_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  return $key->verify_hash(@_);
 }
 
 sub ecc_shared_secret {
@@ -142,11 +170,11 @@ Crypt::PK::ECC - Public key cryptography based on EC
   
  #Signature: Alice
  my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
- my $sig = $priv->sign($message);
+ my $sig = $priv->sign_message($message);
  #
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::ECC->new('Alice_pub_ecc1.der');
- $pub->verify($sig, $message) or die "ERROR";
+ $pub->verify_message($sig, $message) or die "ERROR";
  
  #Shared secret
  my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
@@ -168,9 +196,9 @@ Crypt::PK::ECC - Public key cryptography based on EC
  my $pt = ecc_decrypt('Bob_priv_ecc1.der', $ct);
   
  #Signature: Alice
- my $sig = ecc_sign('Alice_priv_ecc1.der', $message);
+ my $sig = ecc_sign_message('Alice_priv_ecc1.der', $message);
  #Signature: Bob (received $message + $sig)
- ecc_verify('Alice_pub_ecc1.der', $sig, $message) or die "ERROR";
+ ecc_verify_message('Alice_pub_ecc1.der', $sig, $message) or die "ERROR";
  
  #Shared secret
  my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
@@ -186,23 +214,65 @@ all of the Diffie-Hellman routines (ECDH).
 
 Elliptic Curve Diffie-Hellman (ECDH) encryption.
 
-ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
+ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext. See method L</encrypt> below.
+
+ my $ct = ecc_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
 
 =head2 ecc_decrypt
 
-Elliptic Curve Diffie-Hellman (ECDH) decryption
+Elliptic Curve Diffie-Hellman (ECDH) decryption. See method L</decrypt> below.
 
-=head2 ecc_sign
+ my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = ecc_decrypt(\$buffer_containing_priv_key, $ciphertext);
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation
+=head2 ecc_sign_message
 
-=head2 ecc_verify
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_message> below.
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification
+ my $sig = ecc_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = ecc_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = ecc_sign_message($priv_key, $message, $hash_name);
+
+=head2 ecc_verify_message
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_message> below.
+
+ ecc_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 ecc_sign_hash
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_hash> below.
+
+ my $sig = ecc_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = ecc_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 ecc_verify_hash
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_hash> below.
+
+ ecc_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ ecc_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head2 ecc_shared_secret
 
-Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key.
+Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
+
+ #on Alice side
+ my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
+ 
+ #on Bob side
+ my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
 
 =head1 METHODS
 
@@ -258,11 +328,41 @@ ANSI X9.63 Export (public key only)
 
 =head2 encrypt
 
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $ct = $pk->encrypt($message);
+
 =head2 decrypt
 
-=head2 sign
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $pt = $pk->decrypt($ciphertext);
 
-=head2 verify
+=head2 sign_message
+
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $priv->sign_message($message);
+ #or
+ my $signature = $priv->sign_message($message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
+=head2 verify_message
+
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $valid = $pub->verify_message($signature, $message)
+ #or
+ my $valid = $pub->verify_message($signature, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
+=head2 sign_hash
+
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $priv->sign_hash($message_hash);
+
+=head2 verify_hash
+
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $valid = $pub->verify_hash($signature, $message_hash);
 
 =head2 shared_secret
 
@@ -278,4 +378,33 @@ ANSI X9.63 Export (public key only)
 
 =head2 is_private
 
+ my $rv = $pk->is_private;
+ # 1 .. private key loaded
+ # 0 .. public key loaded
+ # undef .. no key loaded
+
 =head2 size
+
+ my $size = $pk->is_private;
+ # returns key size in bytes or undef if no key loaded
+
+=head2 key2hash
+
+ my $hash = $pk->key2hash;
+ 
+ # returns hash like this (or undef if no key loaded):
+ {
+   type => 1,
+   size => 32,
+   curve_name  => "ECC-256",
+   curve_size  => 32,
+   curve_B     => "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B",
+   curve_Gx    => "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296",
+   curve_Gy    => "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5",
+   curve_order => "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
+   curve_prime => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
+   k => "A7F43ACD4A05D69AE4597E6E723EB5F1E9B9B7EAA51B6DE83CF36F9687B57DEE",
+   pub_x => "AB53ED5D16CE550BAAF16BA4F161332AAD56D63790629C27871ED515D4FC229C",
+   pub_y => "78FC34C6A320E22672A96EBB6DA48387A40541A3D7E5CFAE0D58A513E38C8888",
+   pub_z => "1",
+ }
