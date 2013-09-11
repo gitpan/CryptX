@@ -4,16 +4,16 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign dsa_verify )] );
+our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Digest;
+use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-sub new { 
+sub new {
   my ($class, $f) = @_;
   my $self = _new();
   $self->import_key($f) if $f;
@@ -24,11 +24,11 @@ sub export_key_pem {
   my ($self, $type) = @_;
   my $key = $self->export_key_der($type||'');
   return undef unless $key;
-  
+
   return "-----BEGIN DSA PRIVATE KEY-----\n" .
          encode_base64($key) .
          "-----END DSA PRIVATE KEY-----\n " if $type eq 'private';
-  
+
   return "-----BEGIN PUBLIC KEY-----\n" .
          encode_base64($key) .
          "-----END PUBLIC KEY-----\n " if $type eq 'public';
@@ -63,23 +63,47 @@ sub import_key {
 
 sub encrypt {
   my ($self, $data, $hash_name) = @_;
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');  
+  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
   return $self->_encrypt($data, $hash_name);
 }
 
 sub decrypt {
-  my ($self, $data) = @_; 
+  my ($self, $data) = @_;
   return $self->_decrypt($data);
 }
 
-sub sign {
-  my ($self, $data) = @_;  
-  return $self->_sign($data);
+sub _truncate {
+  my ($self, $hash) = @_;
+  ### section 4.6 of FIPS 186-4
+  # let N be the bit length of q
+  # z = the leftmost min(N, outlen) bits of Hash(M).
+  my $q = $self->size_q; # = size in bytes
+  return $hash if $q >= length($hash);
+  return substr($hash, 0, $q);
 }
 
-sub verify {
-  my ($self, $sig, $data) = @_;  
-  return $self->_verify($sig, $data);
+sub sign_message {
+  my ($self, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_sign($self->_truncate($data_hash));
+}
+
+sub sign_hash {
+  my ($self, $data_hash) = @_;
+  return $self->_sign($self->_truncate($data_hash));
+}
+
+sub verify_message {
+  my ($self, $sig, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_verify($sig, $self->_truncate($data_hash));
+}
+
+sub verify_hash {
+  my ($self, $sig, $data_hash) = @_;
+  return $self->_verify($sig, $self->_truncate($data_hash));
 }
 
 ### FUNCTIONS
@@ -94,22 +118,36 @@ sub dsa_encrypt {
 sub dsa_decrypt {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
-sub dsa_sign {
-  my $key = shift;
-  $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
-  return $key->sign(@_);
-}
-
-sub dsa_verify {
+sub dsa_sign_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
-  return $key->verify(@_);
+  return $key->sign_message(@_);
+}
+
+sub dsa_verify_message {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  return $key->verify_message(@_);
+}
+
+sub dsa_sign_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  return $key->sign_hash(@_);
+}
+
+sub dsa_verify_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  return $key->verify_hash(@_);
 }
 
 sub _slurp_file {
@@ -135,23 +173,23 @@ Crypt::PK::DSA - Public key cryptography based on DSA
 =head1 SYNOPSIS
 
  ### OO interface
- 
+
  #Encryption: Alice
- my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der'); 
+ my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der');
  my $ct = $pub->encrypt("secret message");
  #
  #Encryption: Bob (received ciphertext $ct)
  my $priv = Crypt::PK::DSA->new('Bob_priv_dsa1.der');
  my $pt = $priv->decrypt($ct);
-  
+
  #Signature: Alice
  my $priv = Crypt::PK::DSA->new('Alice_priv_dsa1.der');
- my $sig = $priv->sign($message);
+ my $sig = $priv->sign_message($message);
  #
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::DSA->new('Alice_pub_dsa1.der');
- $pub->verify($sig, $message) or die "ERROR";
- 
+ $pub->verify_message($sig, $message) or die "ERROR";
+
  #Key generation
  my $pk = Crypt::PK::DSA->new();
  $pk->generate_key(30, 256);
@@ -161,37 +199,73 @@ Crypt::PK::DSA - Public key cryptography based on DSA
  my $public_pem = $pk->export_key_pem('public');
 
  ### Functional interface
- 
+
  #Encryption: Alice
  my $ct = dsa_encrypt('Bob_pub_dsa1.der', "secret message");
  #Encryption: Bob (received ciphertext $ct)
  my $pt = dsa_decrypt('Bob_priv_dsa1.der', $ct);
-  
+
  #Signature: Alice
- my $sig = dsa_sign('Alice_priv_dsa1.der', $message);
+ my $sig = dsa_sign_message('Alice_priv_dsa1.der', $message);
  #Signature: Bob (received $message + $sig)
- dsa_verify('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
+ dsa_verify_message('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
 
 =head1 FUNCTIONS
 
 =head2 dsa_encrypt
 
-DSA based encryption.
+DSA based encryption. See method L</encrypt> below.
 
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared key is computed, and 
+ my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared key is computed, and
 the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
 
 =head2 dsa_decrypt
 
-DSA based decryption.
+DSA based decryption. See method L</decrypt> below.
 
-=head2 dsa_sign
+ my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
 
-Generate DSA signature.
+=head2 dsa_sign_message
 
-=head2 dsa_verify
+Generate DSA signature. See method L</sign_message> below.
 
-Verify DSA signature.
+ my $sig = dsa_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = dsa_sign_message($priv_key, $message, $hash_name);
+
+=head2 dsa_verify_message
+
+Verify DSA signature. See method L</verify_message> below.
+
+ dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 dsa_sign_hash
+
+Generate DSA signature. See method L</sign_hash> below.
+
+ my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 dsa_verify_hash
+
+Verify DSA signature. See method L</verify_hash> below.
+
+ dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head1 METHODS
 
@@ -209,14 +283,21 @@ Uses Yarrow-based cryptographically strong random number generator seeded with
 random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($group_size, $modulus_size);
- # $group_size  ... 15 < $group_size < 1024
- # $modulus_size .. ($modulus_size - $group_size) < 512
- 
- # Bits of Security  $group_size  $modulus_size
- # 80                20           128
- # 120               30           256
- # 140               35           384
- # 160               40           512
+ # $group_size  ... in bytes .. 15 < $group_size < 1024
+ # $modulus_size .. in bytes .. ($modulus_size - $group_size) < 512
+
+ ### Bits of Security according to libtomcrypt documentation
+ # 80 bits   => generate_key(20, 128)
+ # 120 bits  => generate_key(30, 256)
+ # 140 bits  => generate_key(35, 384)
+ # 160 bits  => generate_key(40, 512)
+
+ ### Sizes according section 4.2 of FIPS 186-4
+ # (L and N are the bit lengths of p and q respectively)
+ # L = 1024, N = 160 => generate_key(20, 128)
+ # L = 2048, N = 224 => generate_key(28, 256)
+ # L = 2048, N = 256 => generate_key(32, 256)
+ # L = 3072, N = 256 => generate_key(32, 384)
 
 =head2 import_key
 
@@ -238,12 +319,66 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 encrypt
 
+ my $pk = Crypt::PK::DSA->new($pub_key_filename);
+ my $ct = $pk->encrypt($message);
+
 =head2 decrypt
 
-=head2 sign
+ my $pk = Crypt::PK::DSA->new($priv_key_filename);
+ my $pt = $pk->decrypt($ciphertext);
 
-=head2 verify
+=head2 sign_message
+
+ my $pk = Crypt::PK::DSA->new($priv_key_filename);
+ my $signature = $priv->sign_message($message);
+ #or
+ my $signature = $priv->sign_message($message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
+=head2 verify_message
+
+ my $pk = Crypt::PK::DSA->new($pub_key_filename);
+ my $valid = $pub->verify_message($signature, $message)
+ #or
+ my $valid = $pub->verify_message($signature, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
+=head2 sign_hash
+
+ my $pk = Crypt::PK::DSA->new($priv_key_filename);
+ my $signature = $priv->sign_hash($message_hash);
+
+=head2 verify_hash
+
+ my $pk = Crypt::PK::DSA->new($pub_key_filename);
+ my $valid = $pub->verify_hash($signature, $message_hash);
 
 =head2 is_private
 
+ my $rv = $pk->is_private;
+ # 1 .. private key loaded
+ # 0 .. public key loaded
+ # undef .. no key loaded
+
 =head2 size
+
+ my $size = $pk->is_private;
+ # returns key size in bytes or undef if no key loaded
+
+=head2 key2hash
+
+ my $hash = $pk->key2hash;
+ 
+ returns hash like this (or undef if no key loaded):
+ {
+   type => 1,  # integer: 1 .. private, 0 .. public
+   qord => 30, # integer: order of the sub-group
+   # all the rest are hex strings  
+   g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator
+   p => "AAF839A764E04D80824B79FA1F0496C093...", #prime used to generate the sub-group
+   q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #large prime that generats the field the contains the sub-group
+   x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key
+   y => "8F7604D77FA62C7539562458A63C7611B7...", #public key
+ }
