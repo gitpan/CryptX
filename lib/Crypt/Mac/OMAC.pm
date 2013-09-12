@@ -148,7 +148,9 @@ Logically joins all arguments into a single string, and returns its OMAC message
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
+=item * L<CryptX|CryptX>
+
+=item * L<https://en.wikipedia.org/wiki/OMAC_%28cryptography%29|https://en.wikipedia.org/wiki/OMAC_%28cryptography%29>
 
 =back
 

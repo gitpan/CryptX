@@ -224,11 +224,11 @@ provides:
     version: 0
   CryptX:
     file: lib/CryptX.pm
-    version: 0.014_1
+    version: 0.014_2
 requires:
   Exporter: 5.59
   MIME::Base64: 3.11
   perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.014_1
+version: 0.014_2
