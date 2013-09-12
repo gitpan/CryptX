@@ -311,14 +311,14 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.014"
+         "version" : "0.014_1"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.014"
+   "version" : "0.014_1"
 }

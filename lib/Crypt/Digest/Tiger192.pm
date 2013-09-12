@@ -38,7 +38,7 @@ Crypt::Digest::Tiger192 - Hash function Tiger-192 [size: 192 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u 
+   use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u
                                         tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
 
    # calculate digest from string/buffer
@@ -214,11 +214,11 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
 
-=item L<http://en.wikipedia.org/wiki/Tiger_(cryptography)|http://en.wikipedia.org/wiki/Tiger_(cryptography)>
+=item * L<http://en.wikipedia.org/wiki/Tiger_(cryptography)|http://en.wikipedia.org/wiki/Tiger_(cryptography)>
 
 =back
 

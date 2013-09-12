@@ -26,7 +26,7 @@ Crypt::Cipher::DES_EDE - Symetric cipher DES_EDE (aka Tripple-DES, 3DES), key si
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('DES_EDE');
@@ -35,7 +35,7 @@ Crypt::Cipher::DES_EDE - Symetric cipher DES_EDE (aka Tripple-DES, 3DES), key si
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::DES_EDE;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::DES_EDE', -key=>$key, -iv=>$iv );
@@ -47,7 +47,7 @@ This module implements the DES_EDE cipher. Provided interface is compliant with 
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
 
 =head1 METHODS
 
@@ -107,11 +107,11 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
 
-=item L<http://en.wikipedia.org/wiki/Triple_DES|http://en.wikipedia.org/wiki/Triple_DES>
+=item * L<http://en.wikipedia.org/wiki/Triple_DES|http://en.wikipedia.org/wiki/Triple_DES>
 
 =back
 

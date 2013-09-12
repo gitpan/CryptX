@@ -38,7 +38,7 @@ Crypt::Digest::SHA384 - Hash function SHA-384 [size: 384 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_b64u 
+   use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_b64u
                                         sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u );
 
    # calculate digest from string/buffer
@@ -214,11 +214,11 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
 
-=item L<http://en.wikipedia.org/wiki/SHA-2|http://en.wikipedia.org/wiki/SHA-2>
+=item * L<http://en.wikipedia.org/wiki/SHA-2|http://en.wikipedia.org/wiki/SHA-2>
 
 =back
 

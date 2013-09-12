@@ -38,7 +38,7 @@ Crypt::Digest::SHA512 - Hash function SHA-512 [size: 512 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_b64u 
+   use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_b64u
                                         sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u );
 
    # calculate digest from string/buffer
@@ -214,11 +214,11 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
 
-=item L<http://en.wikipedia.org/wiki/SHA-2|http://en.wikipedia.org/wiki/SHA-2>
+=item * L<http://en.wikipedia.org/wiki/SHA-2|http://en.wikipedia.org/wiki/SHA-2>
 
 =back
 

@@ -53,7 +53,7 @@ Crypt::AuthEnc::CCM - Authenticated encryption in CCM mode
  #### send ($ciphertext, $tag, $nonce, $header) to other party
 
  my $plaintext = ccm_decrypt_verify('AES', $key, $nonce, $header, $ciphertext, $tag);
- 
+
 =head1 DESCRIPTION
 
 CCM is a encrypt+authenticate mode that is centered around using AES (or any 16-byte cipher) as aprimitive.
@@ -72,7 +72,7 @@ You can export selected functions:
 =head2 ccm_encrypt_authenticate
 
  my ($ciphertext, $tag) = ccm_encrypt_authenticate($cipher, $key, $nonce, $header, $tag_len, $plaintext);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
@@ -81,15 +81,15 @@ You can export selected functions:
 =head2 ccm_decrypt_verify
 
   my $plaintext = ccm_decrypt_verify($cipher, $key, $nonce, $header, $ciphertext, $tag);
-  
+
   # on error returns undef
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Mode::EAX|Crypt::Mode::EAX>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
+=item * L<CryptX|CryptX>, L<Crypt::Mode::EAX|Crypt::Mode::EAX>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
 
-=item L<https://en.wikipedia.org/wiki/CCM_mode|https://en.wikipedia.org/wiki/CCM_mode>
+=item * L<https://en.wikipedia.org/wiki/CCM_mode|https://en.wikipedia.org/wiki/CCM_mode>
 
 =back

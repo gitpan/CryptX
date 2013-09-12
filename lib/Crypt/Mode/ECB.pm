@@ -58,7 +58,7 @@ BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CB
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
  # $cipher_rounds ... optional num of rounds for given cipher
- 
+
 =head2 encrypt
 
    my $ciphertext = $m->encrypt($plaintext, $key);
@@ -69,9 +69,15 @@ BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CB
 
 =head2 start_encrypt
 
+See example below L</finish>.
+
 =head2 start_decrypt
 
+See example below L</finish>.
+
 =head2 add
+
+See example below L</finish>.
 
 =head2 finish
 
@@ -91,8 +97,8 @@ BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CB
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>
+=item * L<CryptX|CryptX>
 
 =back

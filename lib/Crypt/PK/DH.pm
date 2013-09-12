@@ -13,7 +13,7 @@ use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-sub new { 
+sub new {
   my ($class, $f) = @_;
   my $self = _new();
   $self->import_key($f) if $f;
@@ -46,12 +46,12 @@ sub import_key {
 
 sub encrypt {
   my ($self, $data, $hash_name) = @_;
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');  
+  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
   return $self->_encrypt($data, $hash_name);
 }
 
 sub decrypt {
-  my ($self, $data) = @_; 
+  my ($self, $data) = @_;
   return $self->_decrypt($data);
 }
 
@@ -75,7 +75,7 @@ sub sign_hash {
 }
 
 sub verify_hash {
-  my ($self, $sig, $data_hash) = @_;  
+  my ($self, $sig, $data_hash) = @_;
   return $self->_verify($sig, $data_hash);
 }
 
@@ -91,35 +91,35 @@ sub dh_encrypt {
 sub dh_decrypt {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
 sub dh_sign_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
 sub dh_verify_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
 sub dh_sign_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
 sub dh_verify_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -155,15 +155,15 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 =head1 SYNOPSIS
 
  ### OO interface
- 
+
  #Encryption: Alice
- my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key'); 
+ my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key');
  my $ct = $pub->encrypt("secret message");
  #
  #Encryption: Bob (received ciphertext $ct)
  my $priv = Crypt::PK::DH->new('Bob_priv_dh1.key');
  my $pt = $priv->decrypt($ct);
-  
+
  #Signature: Alice
  my $priv = Crypt::PK::DH->new('Alice_priv_dh1.key');
  my $sig = $priv->sign_message($message);
@@ -171,10 +171,10 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::DH->new('Alice_pub_dh1.key');
  $pub->verify_message($sig, $message) or die "ERROR";
- 
+
  #Shared secret
  my $priv = Crypt::PK::DH->new('Alice_priv_dh1.key');
- my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key'); 
+ my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key');
  my $shared_secret = $priv->shared_secret($pub);
 
  #Key generation
@@ -182,19 +182,19 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  $pk->generate_key(128);
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
- 
+
  ### Functional interface
- 
+
  #Encryption: Alice
  my $ct = dh_encrypt('Bob_pub_dh1.key', "secret message");
  #Encryption: Bob (received ciphertext $ct)
  my $pt = dh_decrypt('Bob_priv_dh1.key', $ct);
-  
+
  #Signature: Alice
  my $sig = dh_sign_message('Alice_priv_dh1.key', $message);
  #Signature: Bob (received $message + $sig)
  dh_verify_message('Alice_pub_dh1.key', $sig, $message) or die "ERROR";
- 
+
  #Shared secret
  my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
 
@@ -209,6 +209,11 @@ DH based encryption as implemented by libtomcrypt. See method L</encrypt> below.
  my $ct = dh_encrypt(\$buffer_containing_pub_key, $message);
  #or
  my $ct = dh_encrypt($pub_key_filename, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DH key is computed, and
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
 
 =head2 dh_decrypt
 
@@ -260,7 +265,7 @@ DH based shared secret generation. See method L</shared_secret> below.
 
  #on Alice side
  my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
- 
+
  #on Bob side
  my $shared_secret = dh_shared_secret('Bob_priv_dh1.key', 'Alice_pub_dh1.key');
 
@@ -293,6 +298,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
+Loads private or public key (exported by L</export_key>).
+
   $pk->import_key($filename);
   #or
   $pk->import_key(\$buffer_containing_key);
@@ -309,8 +316,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  my $ct = $pk->encrypt($message);
  #or
  my $ct = $pk->encrypt($message, $hash_name);
- 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
 
@@ -324,7 +331,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $signature = $priv->sign_message($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
@@ -333,7 +340,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $valid = $pub->verify_message($signature, $message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_hash
 
@@ -366,18 +373,18 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 size
 
- my $size = $pk->is_private;
+ my $size = $pk->size;
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash
 
  my $hash = $pk->key2hash;
- 
+
  # returns hash like this (or undef if no key loaded):
  {
-   type => 0,
-   size => 256,
-   name => "DH-2048",
-   x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...",
-   y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...",
+   type => 0,   # integer: 1 .. private, 0 .. public
+   size => 256, # integer: key size in bytes
+   name => "DH-2048", # internal libtomcrypt name
+   x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...", #private key
+   y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
 }
