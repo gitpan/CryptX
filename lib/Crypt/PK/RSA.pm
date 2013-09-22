@@ -9,34 +9,33 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
+use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
 sub new {
-  my ($class, $f) = @_;
+  my ($class, $f, $p) = @_;
   my $self = _new();
-  $self->import_key($f) if $f;
+  $self->import_key($f, $p) if $f;
   return  $self;
 }
 
 sub export_key_pem {
-  my ($self, $type) = @_;
+  my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
   return undef unless $key;
-
+  
   # PKCS#1 RSAPrivateKey** (PEM header: BEGIN RSA PRIVATE KEY)
   # PKCS#8 PrivateKeyInfo* (PEM header: BEGIN PRIVATE KEY)
   # PKCS#8 EncryptedPrivateKeyInfo** (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
-  return "-----BEGIN RSA PRIVATE KEY-----\n" .
-         encode_base64($key) .
-         "-----END RSA PRIVATE KEY-----\n " if $type eq 'private';
+  return Crypt::PK::_asn1_to_pem($key, "RSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
 
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
+  return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
   # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
-  return "-----BEGIN PUBLIC KEY-----\n" .
-         encode_base64($key) .
-         "-----END PUBLIC KEY-----\n " if $type eq 'public';
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
+  
 }
 
 sub generate_key {
@@ -46,20 +45,20 @@ sub generate_key {
 }
 
 sub import_key {
-  my ($self, $key) = @_;
+  my ($self, $key, $password) = @_;
   croak "FATAL: undefined key" unless $key;
   my $data;
   if (ref($key) eq 'SCALAR') {
     $data = $$key;
   }
   elsif (-f $key) {
-    $data = _slurp_file($key);
+    $data = Crypt::PK::_slurp_file($key);
   }
   else {
     croak "FATAL: non-existing file '$key'";
   }
-  if ($data && $data =~ /-----BEGIN (RSA PRIVATE|RSA PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = decode_base64($2);
+  if ($data && $data =~ /-----BEGIN (RSA PRIVATE|RSA PUBLIC|PRIVATE|PUBLIC|ENCRYPTED PRIVATE) KEY-----(.*?)-----END/sg) {
+    $data = Crypt::PK::_pem_to_asn1($data, $password);
   }
   croak "FATAL: invalid key format" unless $data;
   $self->_import($data);
@@ -162,16 +161,6 @@ sub rsa_verify_message {
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
-}
-
-sub _slurp_file {
-  my $f = shift;
-  local $/ = undef;
-  open FILE, "<", $f or croak "FATAL: couldn't open file: $!";
-  binmode FILE;
-  my $string = <FILE>;
-  close FILE;
-  return $string;
 }
 
 sub CLONE_SKIP { 1 } # prevent cloning
@@ -316,6 +305,12 @@ Verify RSA signature. See method L</verify_hash> below.
   #or
   my $pk = Crypt::PK::RSA->new(\$buffer_containing_priv_or_pub_key);
 
+Support for password protected PEM keys
+
+  my $pk = Crypt::PK::RSA->new($priv_pem_key_filename, $password);
+  #or
+  my $pk = Crypt::PK::RSA->new(\$buffer_containing_priv_pem_key, $password);
+
 =head2 generate_key
 
 Uses Yarrow-based cryptographically strong random number generator seeded with
@@ -333,6 +328,12 @@ Loads private or public key in DER or PEM format (password protected keys are no
   #or
   $pk->import_key(\$buffer_containing_priv_or_pub_key);
 
+Support for password protected PEM keys
+
+  $pk->import_key($pem_filename, $password);
+  #or
+  $pk->import_key(\$buffer_containing_pem_key, $password);
+
 =head2 export_key_der
 
  my $private_der = $pk->export_key_der('private');
@@ -344,6 +345,32 @@ Loads private or public key in DER or PEM format (password protected keys are no
  my $private_pem = $pk->export_key_pem('private');
  #or
  my $public_pem = $pk->export_key_pem('public');
+ #or
+ my $public_pem = $pk->export_key_pem('public_x509');
+
+With parameter C<'public'> uses header and footer lines:
+
+  -----BEGIN RSA PUBLIC KEY------
+  -----END RSA PUBLIC KEY------
+
+With parameter C<'public_x509'> uses header and footer lines:
+
+  -----BEGIN PUBLIC KEY------
+  -----END PUBLIC KEY------
+
+Support for password protected PEM keys
+
+ my $private_pem = $pk->export_key_pem('private', $password);
+ #or
+ my $private_pem = $pk->export_key_pem('private', $password, $cipher);
+ 
+ # supported ciphers: 'DES-CBC'
+ #                    'DES-EDE3-CBC'
+ #                    'DES-EDE3'
+ #                    'SEED-CBC'
+ #                    'AES-128-CBC'
+ #                    'AES-192-CBC'
+ #                    'AES-256-CBC' (DEFAULT)
 
 =head2 encrypt
 
