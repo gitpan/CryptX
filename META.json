@@ -18,7 +18,7 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0",
             "File::Find" : "0",
-            "MIME::Base64" : "3.11",
+            "MIME::Base64" : "0",
             "Module::Build" : "0",
             "Test::More" : "0.88"
          }
@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.59",
-            "MIME::Base64" : "3.11",
+            "MIME::Base64" : "0",
             "perl" : "5.006"
          }
       }
@@ -246,14 +246,14 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.016_3"
+         "version" : "0.017"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.016_3"
+   "version" : "0.017"
 }
