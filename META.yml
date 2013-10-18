@@ -158,11 +158,12 @@ provides:
     file: lib/Crypt/PRNG/Yarrow.pm
   CryptX:
     file: lib/CryptX.pm
-    version: 0.017
+    version: 0.018
 requires:
   Exporter: 5.59
   MIME::Base64: 0
   perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.017
+  repository: https://github.com/DCIT/perl-CryptX
+version: 0.018

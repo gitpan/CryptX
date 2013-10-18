@@ -246,14 +246,17 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/DCIT/perl-CryptX"
+      }
    },
-   "version" : "0.017"
+   "version" : "0.018"
 }
