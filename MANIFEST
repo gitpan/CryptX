@@ -614,7 +614,15 @@ t/data/dsa-des.pem
 t/data/dsa-des3.pem
 t/data/dsa-param.pem
 t/data/dsa-seed.pem
-t/data/info.txt
+t/data/ec-aes128.pem
+t/data/ec-aes192.pem
+t/data/ec-aes256.pem
+t/data/ec-camellia128.pem
+t/data/ec-camellia192.pem
+t/data/ec-camellia256.pem
+t/data/ec-des.pem
+t/data/ec-des3.pem
+t/data/ec-seed.pem
 t/data/openssl_dsa1.der
 t/data/openssl_dsa1.pem
 t/data/openssl_dsa2.der

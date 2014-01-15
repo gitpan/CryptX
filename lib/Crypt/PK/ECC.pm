@@ -328,9 +328,9 @@ our %curve = (
 );
 
 sub new {
-  my ($class, $f) = @_;
+  my ($class, $f, $p) = @_;
   my $self = _new();
-  $self->import_key($f) if $f;
+  $self->import_key($f, $p) if $f;
   return  $self;
 }
 
@@ -511,78 +511,9 @@ Crypt::PK::ECC - Public key cryptography based on EC
 
 =head1 DESCRIPTION
 
-The module provides a set of core ECC functions as well that are designed to be the Elliptic Curve analogy of
-all of the Diffie-Hellman routines (ECDH).
+The module provides a set of core ECC functions as well as implementation of ECDSA and ECDH.
 
-=head1 FUNCTIONS
-
-=head2 ecc_encrypt
-
-Elliptic Curve Diffie-Hellman (ECDH) encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = ecc_encrypt($pub_key_filename, $message);
- #or
- my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = ecc_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
-
-=head2 ecc_decrypt
-
-Elliptic Curve Diffie-Hellman (ECDH) decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = ecc_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 ecc_sign_message
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_message> below.
-
- my $sig = ecc_sign_message($priv_key_filename, $message);
- #or
- my $sig = ecc_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = ecc_sign_message($priv_key, $message, $hash_name);
-
-=head2 ecc_verify_message
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_message> below.
-
- ecc_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- ecc_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- ecc_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 ecc_sign_hash
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_hash> below.
-
- my $sig = ecc_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = ecc_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 ecc_verify_hash
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_hash> below.
-
- ecc_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- ecc_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
-
-=head2 ecc_shared_secret
-
-Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
-
- #on Alice side
- my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
-
- #on Bob side
- my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
+Supports elliptic curves C<y^2 = x^3 + a*x + b> over prime fields C<Fp = Z/pZ> (binary fields not supported).
 
 =head1 METHODS
 
@@ -593,6 +524,12 @@ Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret 
   my $pk = Crypt::PK::ECC->new($priv_or_pub_key_filename);
   #or
   my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_or_pub_key);
+
+Support for password protected PEM keys
+
+  my $pk = Crypt::PK::ECC->new($priv_pem_key_filename, $password);
+  #or
+  my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_pem_key, $password);
 
 =head2 generate_key
 
@@ -625,7 +562,7 @@ The following pre-defined C<$curve_name> values are supported:
  'secp192r1'
  'secp224k1'
  'secp224r1'
- 'secp256k1'
+ 'secp256k1' ... used by Bitcoin
  'secp256r1'
  'secp384r1'
  'secp521r1'
@@ -808,6 +745,167 @@ private key is exported as raw bytes (padded with leading zeros to have the same
    pub_x          => "5AE1ACE3ED0AEA9707CE5C0BCE014F6A2F15023A",
    pub_y          => "895D57E992D0A15F88D6680B27B701F615FCDC0F",
  }
+
+=head1 FUNCTIONS
+
+=head2 ecc_encrypt
+
+Elliptic Curve Diffie-Hellman (ECDH) encryption as implemented by libtomcrypt. See method L</encrypt> below.
+
+ my $ct = ecc_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = ecc_encrypt($pub_key_filename, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
+
+=head2 ecc_decrypt
+
+Elliptic Curve Diffie-Hellman (ECDH) decryption as implemented by libtomcrypt. See method L</decrypt> below.
+
+ my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = ecc_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
+=head2 ecc_sign_message
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_message> below.
+
+ my $sig = ecc_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = ecc_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = ecc_sign_message($priv_key, $message, $hash_name);
+
+=head2 ecc_verify_message
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_message> below.
+
+ ecc_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 ecc_sign_hash
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_hash> below.
+
+ my $sig = ecc_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = ecc_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 ecc_verify_hash
+
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_hash> below.
+
+ ecc_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ ecc_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+
+=head2 ecc_shared_secret
+
+Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
+
+ #on Alice side
+ my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
+
+ #on Bob side
+ my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
+
+=head1 OpenSSL interoperability
+
+ ### let's have:
+ # ECC private key in PEM format - eckey.priv.pem
+ # ECC public key in PEM format  - eckey.pub.pem
+ # data file to be signed - input.data
+
+=head2 Sign by OpenSSL, verify by Crypt::PK::ECC
+
+Create signature (from commandline):
+
+ openssl dgst -sha1 -sign eckey.priv.pem -out input.sha1-ec.sig input.data
+
+Verify signature (Perl code):
+
+ use Crypt::PK::ECC;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'read_file';
+  
+ my $pkec = Crypt::PK::ECC->new("eckey.pub.pem");
+ my $signature = read_file("input.sha1-ec.sig", binmode=>':raw');
+ my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ print $valid ? "SUCCESS" : "FAILURE";
+
+=head2 Sign by Crypt::PK::ECC, verify by OpenSSL
+
+Create signature (Perl code):
+
+ use Crypt::PK::ECC;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'write_file';
+  
+ my $pkec = Crypt::PK::ECC->new("eckey.priv.pem");
+ my $signature = $pkec->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ write_file("input.sha1-ec.sig", {binmode=>':raw'}, $signature);
+
+Verify signature (from commandline):
+
+ openssl dgst -sha1 -verify eckey.pub.pem -signature input.sha1-ec.sig input.data
+
+=head2 Keys generated by Crypt::PK::ECC
+
+Generate keys (Perl code):
+
+ use Crypt::PK::ECC;
+ use File::Slurp 'write_file';
+ 
+ my $pkec = Crypt::PK::ECC->new;
+ $pkec->generate_key('secp160k1');
+ write_file("eckey.pub.der",  {binmode=>':raw'}, $pkec->export_key_der('public'));
+ write_file("eckey.priv.der", {binmode=>':raw'}, $pkec->export_key_der('private'));
+ write_file("eckey.pub.pem",  $pkec->export_key_pem('public'));
+ write_file("eckey.priv.pem", $pkec->export_key_pem('private'));
+ write_file("eckey-passwd.priv.pem", $pkec->export_key_pem('private', 'secret'));
+
+Use keys by OpenSSL:
+
+ openssl ec -in eckey.priv.der -text -inform der
+ openssl ec -in eckey.priv.pem -text
+ openssl ec -in eckey-passwd.priv.pem -text -inform pem -passin pass:secret
+ openssl ec -in eckey.pub.der -pubin -text -inform der
+ openssl ec -in eckey.pub.pem -pubin -text 
+
+=head2 Keys generated by OpenSSL
+
+Generate keys:
+
+ openssl ecparam -param_enc explicit -name prime192v3 -genkey -out eckey.priv.pem
+ openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.pub.pem -pubout
+ openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.priv.der -outform der
+ openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.pub.der -outform der -pubout
+ openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.privc.der -outform der -conv_form compressed
+ openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.pubc.der -outform der -pubout -conv_form compressed
+ openssl ec -param_enc explicit -in eckey.priv.pem -passout pass:secret -des3 -out eckey-passwd.priv.pem
+
+B<IMPORTANT:> it is necessary to use C<-param_enc explicit> option
+
+Load keys (Perl code):
+
+ use Crypt::PK::ECC;
+ use File::Slurp 'write_file';
+ 
+ my $pkec = Crypt::PK::ECC->new;
+ $pkec->import_key("eckey.pub.der");
+ $pkec->import_key("eckey.pubc.der");
+ $pkec->import_key("eckey.priv.der");
+ $pkec->import_key("eckey.privc.der");
+ $pkec->import_key("eckey.pub.pem");
+ $pkec->import_key("eckey.priv.pem");
+ $pkec->import_key("eckey-passwd.priv.pem", "secret");
 
 =head1 SEE ALSO
 
