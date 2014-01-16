@@ -4,7 +4,7 @@
       "Karel Miko"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "perl_5"
    ],
@@ -246,7 +246,7 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.019_2"
+         "version" : "0.019_3"
       }
    },
    "release_status" : "testing",
@@ -258,5 +258,5 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.019_2"
+   "version" : "0.019_3"
 }

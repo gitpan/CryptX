@@ -5,12 +5,8 @@ use Module::Build;
 use Config;
 
 my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
-#$flags .= ' -DLTC_NO_ASM';
-$flags .= ' -Wall';
-
-unless ($ENV{CRYPTX_USE_ASM} || $Config{archname} =~ /MSWin32-x86/) {
-  $flags .= ' -DLTC_NO_ASM';
-}
+#$flags .= ' -Wall';
+$flags .= ' -DLTC_NO_ASM' if $ENV{CRYPTX_NO_ASM};
 
 my $class = Module::Build->subclass(
     class => 'My::Builder',
