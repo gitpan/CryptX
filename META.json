@@ -246,7 +246,7 @@
       },
       "CryptX" : {
          "file" : "lib/CryptX.pm",
-         "version" : "0.019_3"
+         "version" : "0.019_4"
       }
    },
    "release_status" : "testing",
@@ -258,5 +258,5 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.019_3"
+   "version" : "0.019_4"
 }
